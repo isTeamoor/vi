@@ -1,30 +1,30 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <h1>Выберите тип источника данных</h1>
+  <router-link to="/docx" class="nav-button">Docx</router-link>
+  <router-link to="/xlsx" class="nav-button">Xlsx</router-link>
+  <router-view />
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+<script>
+export default {
+  name: 'App',
+};
+</script>
+
+<style>
+.nav-button {
+  display: inline-block;
+  padding: 10px 20px;
+  margin: 5px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
   text-align: center;
-  color: #2c3e50;
+  cursor: pointer;
+  text-decoration: none; /* Убирает подчеркивание */
 }
-
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+.nav-button:hover {
+  background-color: #0056b3;
 }
 </style>
