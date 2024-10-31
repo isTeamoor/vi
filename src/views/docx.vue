@@ -1,57 +1,83 @@
 <template>
     <div>
-      <input type="file" id="docxFileInput" @change="handleFileSelect" />
-      <div id="BSnumber"></div>
+      <input type="file" id="docxFileInput" @change="extractInfo" />
+
+      <div id="BS">
+        <h1>Определение номера и параметров БС:</h1>
+        <div id="BScell"></div>
+        <div id="BSnumber"></div>
+        <div>Выбранное значение: {{ bs }}</div>
+      </div>
+
+      <div id="Works">
+        <h1>Определение номера и параметров Работ:</h1>
+        <div id="rawWorksTable"></div>
+      </div>
+
       <div id="output"></div>
     </div>
 </template>
   
 <script>
-import mammoth from 'mammoth';
+import {openWord} from '../JS/fileReader.js'
+import {getBSnumber} from '../JS/docxData.js'
+import {createBSform } from '../JS/docxData.js';
+import {getWorksTable} from '../JS/docxData.js';
+import {deleteTotal} from '../JS/docxData.js';
+import {remakeTable} from '../JS/docxData.js';
+import {mergeWorkTypes} from '../JS/docxData.js';
+
 
 export default {
-    methods: {
-        async handleFileSelect(event) {
-            const file = event.target.files[0];
-            const reader = new FileReader();
+  data(){
+    return{
+      bs:{}
+    }
+  },
+  methods: {
+    async extractInfo(event){
+      //Чтение файла
+      document.querySelector('#output').innerHTML = await openWord(event);
 
-            reader.onload = async (e) => {
-                const arrayBuffer = e.target.result;
-                const { value: html } = await mammoth.convertToHtml({ arrayBuffer });
-                document.getElementById('output').innerHTML = html;
+      //Получение сырой строки с данными о БС
+      let BSprops = getBSnumber('#output');
+      document.querySelector('#BScell').textContent = BSprops['BScell'];
 
-                // Ищем целевую строку после вставки HTML
-                const rows = document.querySelectorAll("#output tr");
-                let targetRow = null;
+      //Создание формы с радиокнопками для выбора верного номера БС
+      let targetElement = document.querySelector('#BSnumber');
+      targetElement.innerHTML = createBSform(BSprops);
 
-                rows.forEach((row) => {
-                    row.querySelectorAll("td p").forEach((cell) => {
-                        if (cell.textContent.includes("Номер") && cell.textContent.includes("название БС")) {
-                            targetRow = row;
-                        }
-                    });
-                });
+      const form = document.getElementById('bsForm');
+      form.addEventListener('change', event=> {
+        if (event.target.name === 'bsOptions') {
+          this.bs = {
+            Owner: event.target.getAttribute('owner'),
+            ID: event.target.getAttribute('bsID'),
+            Name: event.target.getAttribute('bsname')
+          };
+        }
+      });
 
-                // Проверяем результат
-                if (targetRow) {
-                    const thirdTd = targetRow.querySelectorAll("td")[2]; // Получаем третий <td>
-                    const value = thirdTd ? thirdTd.textContent.trim() : null; // Извлекаем текст и удаляем лишние пробелы
-
-                    document.querySelector('#BSnumber').textContent=value
-                } else {
-                    console.log("Целевая строка не найдена.");
-                }
-            };
-
-            reader.readAsArrayBuffer(file);
-        },
-    },
+      ///////////////Таблица работ//////////////
+      document.getElementById('rawWorksTable').innerHTML = getWorksTable('#output')
+      document.getElementById('rawWorksTable').innerHTML = deleteTotal('#rawWorksTable table')
+      document.getElementById('rawWorksTable').innerHTML = remakeTable('#rawWorksTable table tr')
+      document.getElementById('rawWorksTable').innerHTML = mergeWorkTypes('#rawWorksTable table tr')
+      
+    }
+  }
 };
 </script>
   
-  <style >
+
+
+<style >
+  #BS, #Works {
+    border: 2px solid black;
+  }
+
   table td {
     border: 2px solid black
   }
-  </style>
+</style>
   
