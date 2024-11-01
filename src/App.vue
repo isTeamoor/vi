@@ -1,8 +1,10 @@
 <template>
-  <h1>Выберите тип источника данных</h1>
-  <router-link to="/docx" class="nav-button">Docx</router-link>
-  <router-link to="/xlsx" class="nav-button">Xlsx</router-link>
-  <router-view />
+  <div class="navigat">
+    <h1>Выберите тип источника данных</h1>
+    <router-link to="/docx" class="nav-button">Docx</router-link>
+    <router-link to="/xlsx" class="nav-button">Xlsx</router-link>
+  </div>
+  <router-view class="display"/>
 </template>
 
 <script>
@@ -12,6 +14,13 @@ export default {
 </script>
 
 <style>
+.navigat {
+  text-align: center;
+}
+.display {
+  background-color: aqua;
+}
+
 .nav-button {
   display: inline-block;
   padding: 10px 20px;

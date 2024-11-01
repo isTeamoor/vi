@@ -1,50 +1,48 @@
-function getBSrow(htmlID){
-    const rows = document.querySelectorAll(`${htmlID} tr`)
-    let targetRow = null;
+import { siteList } from "./sites";
+import { worksList } from './works';
+const fileData = document.getElementById('output')
 
+
+function getBSrow(){
+    let rows = fileData.querySelectorAll('tr')
+    let BSrow = null;
     rows.forEach((row) => {
         row.querySelectorAll("td").forEach((cell) => {
             if (cell.textContent.includes("Номер") && cell.textContent.includes("название БС")) {
-                targetRow = row;
+                BSrow = row.cells[2];
             }
         });
     });
-
-    let thirdTd = targetRow.querySelectorAll("td")[2];
-
-    return thirdTd ? thirdTd.textContent.trim() : 'не найдено'
+    return BSrow
 }
+export function getBSnumber(){
+    let BSrow = getBSrow().textContent
 
-import { siteList } from "./sites";
-export function getBSnumber(htmlID){
-    let BScell = getBSrow(htmlID)
-    if (BScell == 'не найдено') {return 'не найдено'}
-
-    let matches = BScell.match(/\d{3,}/g);
+    let matches = BSrow.match(/\d{3,}/g);
     let numbers = matches ? matches.map(Number) : [];
 
-    let result = {'BScell':BScell};
+    let output = {'BSrow':BSrow};
+
     numbers.forEach(number => {
-        const matchedItems = siteList.filter(item => item.ID === String(number));
+        let matchedSites = siteList.filter(item => item.ID === String(number));
     
-        if (matchedItems.length > 0) {
-            matchedItems.forEach(item => {
-                result[item.ID] = item; // Добавляем объект в результат по его ID
+        if (matchedSites.length > 0) {
+            matchedSites.forEach(site => {
+                output[site.ID] = site; // Добавляем объект в результат по его ID
             });
         }
     });
-    return result
+    return output
 }
-
-export function createBSform(BSprops){
+export function createBSform(BSdata){
     let formHTML = '<form id="bsForm">Выберите номер БС из строки';
 
-    for (let number in BSprops){
-      if (number == 'BScell') {continue};
+    for (let number in BSdata){
+      if (number == 'BSrow') {continue};
 
-      const owner = BSprops[number]['Owner'];
-      const bsID  = BSprops[number]['ID'];
-      const bsname = BSprops[number]['Name'];
+      const owner = BSdata[number]['Owner'];
+      const bsID  = BSdata[number]['ID'];
+      const bsname = BSdata[number]['Name'];
 
       formHTML += `
       <div>
@@ -54,74 +52,41 @@ export function createBSform(BSprops){
     }
 
     formHTML += '</form>';
+
     return formHTML
 }
-
-export function getWorksTable(htmlID) {
-    const tables = document.querySelectorAll(`${htmlID} table`);
-    let worksTableHTML = ''; // Инициализируем пустую строку для HTML
+function getWorksTable() {
+    let tables = fileData.querySelectorAll('table');
+    let rawTable = null;
 
     tables.forEach((table) => {
         table.querySelectorAll("td").forEach((cell) => {
             if (cell.textContent.includes("Наименование работ") || cell.textContent.includes("Цена за единицу")) {
-                worksTableHTML = table.outerHTML
+                rawTable = table
             }
         });
     });
-
-    return worksTableHTML
+    return rawTable
 }
-    
-export function deleteTotal(htmlID){
-    let workTable = document.querySelector(htmlID)
-
-    for (let i = workTable.rows.length - 1; i >= 0; i--) {
-        const row = workTable.rows[i];
-        let hasMergedCells = false;
-    
-        for (const cell of row.cells) {
-            if (cell.colSpan > 1) {
-                hasMergedCells = true;
-                break;
-            }
-        }
-    
-        if (hasMergedCells) {
-            workTable.deleteRow(i);
-            break;
+function isTotalRow(row){
+    let flag = false
+    for (const cell of row.cells) {
+        if (cell.colSpan > 1 || cell.textContent.includes('Итого')) {
+            flag = true;
         }
     }
-    
-    return workTable.outerHTML
+    return flag
 }
-
-export function remakeTable(htmlID) {
-    let rows = document.querySelectorAll(htmlID);
-    
-    let resultTable = document.createElement("table");
+export function modTable() {
+    let rawTable = getWorksTable()
+    let resultTable = document.createElement('table')
+    let rows = rawTable.querySelectorAll('tr')
 
     rows.forEach((row, rowN) => {
-        let newRow = document.createElement("tr");
 
-        Array.from(row.cells).forEach((cell, cellN) => {
-            let newCell = document.createElement(rowN === 0 ? "th" : "td");
-            newCell.textContent = cell.textContent.trim();
-            newRow.appendChild(newCell);
-        });
+        //Проверка, если есть "Итого" или colspan, то удаляем эту строку
+        if (isTotalRow(row)) return
 
-        resultTable.appendChild(newRow);
-    });
-
-    return resultTable.outerHTML
-}
-
-import { worksList } from './works'; // Убедитесь, что вы импортировали worksList
-
-export function mergeWorkTypes(htmlID) {
-    let resultTable = document.createElement("table");
-    let rows = document.querySelectorAll(htmlID);
-
-    rows.forEach((row, rowN) => {
         // Копируем исходные значения ячеек каждой строки в массив
         let rowValues = [];
         Array.from(row.cells).forEach((cell) => {
@@ -130,37 +95,35 @@ export function mergeWorkTypes(htmlID) {
             rowValues.push(newCell);            
         });
 
-        // Добавляем заголовки таблицы только для первой строки (rowN === 0)
+        // Добавляем заголовки таблицы только для первой строки
         if (rowN === 0) {
             const headers = ['ID (src)', 'WorkName (src)', 'UOM (src)', 'Price (src)', 'Owner (src)'];
             headers.forEach(headerText => {
                 let th = document.createElement('th');
                 th.textContent = headerText;
-                rowValues.push(th); // Добавляем заголовки в массив значений строки
+                rowValues.push(th);
             });
             let newRow = document.createElement("tr");
             rowValues.forEach(val => newRow.appendChild(val));
             resultTable.appendChild(newRow);
         }
 
-
+        // Добавляем строки новой таблицы со значениями из старой
         if (rowN !== 0) {
-            let srcIDArray = [];
+            let matchedWorks = [];
             
             let workID = row.cells[0].textContent.match(/(\d+)/g);
             workID = workID.join('.');
 
             worksList.forEach(item => {
                 let srcID = item['ID'].match(/(\d+)/g);
-                if (srcID) {
-                    srcID = srcID.join('.');
-                    if (srcID === workID) {
-                        srcIDArray.push(item);
-                    }
+                srcID = srcID.join('.');
+                if (srcID === workID) {
+                    matchedWorks.push(item);
                 }
             });
 
-            srcIDArray.forEach((item) => {
+            matchedWorks.forEach((item) => {
                 let newRow = document.createElement("tr");
                 
                 // Клонируем каждую ячейку из rowValues и добавляем в newRow
@@ -169,7 +132,7 @@ export function mergeWorkTypes(htmlID) {
                     newRow.appendChild(clonedCell);
                 });
             
-                // Создаем и добавляем ячейки для данных из srcIDArray
+                // Создаем и добавляем ячейки для данных из matchedWorks
                 let newCellID = document.createElement("td");
                 let newCellWorkName = document.createElement("td");
                 let newCellUOM = document.createElement("td");

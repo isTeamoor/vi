@@ -1,26 +1,30 @@
 <template>
     <div>
-      <input type="file" id="docxFileInput" @change="extractInfo" />
+
+      <div class="input-container">
+        <input type="file" id="docxFileInput" @change="extractInfo" />
+      </div>
 
       <div id="BS">
-        <h1>Определение номера и параметров БС:</h1>
-        <div id="BScell"></div>
-        <div id="BSnumber"></div>
+        <h1 style="text-align: center;">Определение номера и параметров БС:</h1>
+        <div id="BSrow" style="margin-bottom: 5px;font-weight: bold;text-align: center;"></div>
+        <div id="BSnumber" style="margin:20px 600px;"></div>
         <div>Выбранное значение: {{ bs }}</div>
       </div>
 
       <div id="Works">
-        <h1>Определение номера и параметров Работ:</h1>
-        <div id="rawWorksTable"></div>
+        <h1 style="text-align: center;">Определение номера и параметров Работ:</h1>
+        <div id="rawTable"></div>
       </div>
 
-      <div>
-        <h1>Сформировать отчёт</h1>
-        <button @click="makeReport">Go</button>
+      <div id="Result" style="text-align: center;">
+        <h1 style="text-align: center;">Сформировать отчёт</h1>
+        <button @click="makeReport" >Go</button>
         <div id="report"></div>
       </div>
 
       <div id="output"></div>
+      
     </div>
 </template>
   
@@ -28,10 +32,7 @@
 import {openWord} from '../JS/fileReader.js'
 import {getBSnumber} from '../JS/docxData.js'
 import {createBSform } from '../JS/docxData.js';
-import {getWorksTable} from '../JS/docxData.js';
-import {deleteTotal} from '../JS/docxData.js';
-import {remakeTable} from '../JS/docxData.js';
-import {mergeWorkTypes} from '../JS/docxData.js';
+import {modTable} from '../JS/docxData.js';
 import {addDeleteButton} from '../JS/docxData.js';
 import {addEventListenersToDeleteButtons} from '../JS/docxData.js';
 import {getReport} from '../JS/docxData.js';
@@ -45,18 +46,21 @@ export default {
   },
   methods: {
     async extractInfo(event){
-      //Чтение файла
-      document.querySelector('#output').innerHTML = await openWord(event);
 
-      //Получение сырой строки с данными о БС
-      let BSprops = getBSnumber('#output');
-      document.querySelector('#BScell').textContent = BSprops['BScell'];
+      // Контейнер для загрузки всей информации из файла
+      let fileData = document.querySelector('#output')
+      fileData.innerHTML = await openWord(event);
+
+
+      //Поиск строки с данными о БС
+      let bsData = getBSnumber();
+      document.querySelector('#BSrow').textContent = bsData['BSrow'];
+
 
       //Создание формы с радиокнопками для выбора верного номера БС
-      let targetElement = document.querySelector('#BSnumber');
-      targetElement.innerHTML = createBSform(BSprops);
+      document.querySelector('#BSnumber').innerHTML = createBSform(bsData);
 
-      const form = document.getElementById('bsForm');
+      let form = document.getElementById('bsForm');
       form.addEventListener('change', event=> {
         if (event.target.name === 'bsOptions') {
           this.bs = {
@@ -67,16 +71,18 @@ export default {
         }
       });
 
+
+
+
+
       ///////////////Таблица работ//////////////
-      document.getElementById('rawWorksTable').innerHTML = getWorksTable('#output')
-      document.getElementById('rawWorksTable').innerHTML = deleteTotal('#rawWorksTable table')
-      document.getElementById('rawWorksTable').innerHTML = remakeTable('#rawWorksTable table tr')
-      document.getElementById('rawWorksTable').innerHTML = mergeWorkTypes('#rawWorksTable table tr')
-      document.getElementById('rawWorksTable').innerHTML = addDeleteButton('#rawWorksTable table tr')
-      addEventListenersToDeleteButtons('#rawWorksTable');     
+      rawTable.innerHTML = modTable()
+      document.getElementById('rawTable').innerHTML = addDeleteButton('#rawTable table tr')
+      addEventListenersToDeleteButtons('#rawTable');     
     },
+    /////////////////Отчёт///////////////////////
     makeReport(){
-      document.getElementById('report').innerHTML = getReport(this.bs, '#rawWorksTable table tr')
+      document.getElementById('report').innerHTML = getReport(this.bs, '#rawTable table tr')
     }
 
   }
@@ -86,12 +92,19 @@ export default {
 
 
 <style >
-  #BS, #Works {
+  #BS, #Works, #Result {
     border: 2px solid black;
   }
 
   table td {
     border: 2px solid black
+  }
+
+  .input-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
   }
 </style>
   
