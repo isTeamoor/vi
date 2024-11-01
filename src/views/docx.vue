@@ -14,6 +14,12 @@
         <div id="rawWorksTable"></div>
       </div>
 
+      <div>
+        <h1>Сформировать отчёт</h1>
+        <button @click="makeReport">Go</button>
+        <div id="report"></div>
+      </div>
+
       <div id="output"></div>
     </div>
 </template>
@@ -26,6 +32,9 @@ import {getWorksTable} from '../JS/docxData.js';
 import {deleteTotal} from '../JS/docxData.js';
 import {remakeTable} from '../JS/docxData.js';
 import {mergeWorkTypes} from '../JS/docxData.js';
+import {addDeleteButton} from '../JS/docxData.js';
+import {addEventListenersToDeleteButtons} from '../JS/docxData.js';
+import {getReport} from '../JS/docxData.js';
 
 
 export default {
@@ -63,8 +72,13 @@ export default {
       document.getElementById('rawWorksTable').innerHTML = deleteTotal('#rawWorksTable table')
       document.getElementById('rawWorksTable').innerHTML = remakeTable('#rawWorksTable table tr')
       document.getElementById('rawWorksTable').innerHTML = mergeWorkTypes('#rawWorksTable table tr')
-      
+      document.getElementById('rawWorksTable').innerHTML = addDeleteButton('#rawWorksTable table tr')
+      addEventListenersToDeleteButtons('#rawWorksTable');     
+    },
+    makeReport(){
+      document.getElementById('report').innerHTML = getReport(this.bs, '#rawWorksTable table tr')
     }
+
   }
 };
 </script>

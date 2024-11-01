@@ -160,32 +160,6 @@ export function mergeWorkTypes(htmlID) {
                 }
             });
 
-            /*if (srcIDArray.length===1){
-                let newRow = document.createElement("tr");
-                rowValues.forEach(val => newRow.appendChild(val));
-
-                let newCellID = document.createElement("td");
-                let newCellWorkName = document.createElement("td");
-                let newCellUOM = document.createElement("td");
-                let newCellPrice = document.createElement("td");
-                let newCellOwner = document.createElement("td");
-
-                newCellID.textContent = srcIDArray[0]['ID'];
-                newCellWorkName.textContent = srcIDArray[0]['Work'];
-                newCellUOM.textContent = srcIDArray[0]['UOM'];
-                newCellPrice.textContent = srcIDArray[0]['Price'];
-                newCellOwner.textContent = srcIDArray[0]['Owner'];
-
-                newRow.appendChild(newCellID);
-                newRow.appendChild(newCellWorkName);
-                newRow.appendChild(newCellUOM);
-                newRow.appendChild(newCellPrice);
-                newRow.appendChild(newCellOwner);
-
-                resultTable.appendChild(newRow); // Добавляем текущую строку в результат
-            }*/
-
-            
             srcIDArray.forEach((item) => {
                 let newRow = document.createElement("tr");
                 
@@ -219,5 +193,139 @@ export function mergeWorkTypes(htmlID) {
         }
     });
 
+    return resultTable.outerHTML; // Возвращаем HTML таблицы
+}
+
+export function addDeleteButton(htmlID) {
+    let resultTable = document.createElement("table");
+    let rows = document.querySelectorAll(htmlID);
+
+    rows.forEach((row, rowN) => {
+        let rowValues = [];
+        Array.from(row.cells).forEach((cell) => {
+            let newCell = document.createElement(rowN === 0 ? "th" : "td");
+            newCell.textContent = cell.textContent.trim();
+            rowValues.push(newCell);            
+        });
+
+        if (rowN === 0){
+            let newRow = document.createElement("tr");
+
+            let headerCell = document.createElement("th");
+            headerCell.textContent = "Удалить строку";
+            newRow.appendChild(headerCell);
+            
+            rowValues.forEach(val => newRow.appendChild(val));
+            resultTable.appendChild(newRow);
+        }
+
+        if (rowN !== 0){
+            let newRow = document.createElement("tr");
+
+            let deleteCell = document.createElement("td");
+            let deleteButton = document.createElement("button");
+            deleteButton.textContent = "Удалить";
+            deleteButton.classList.add("delete-button");
+            
+            deleteCell.appendChild(deleteButton);
+            newRow.appendChild(deleteCell);
+
+            rowValues.forEach(val => newRow.appendChild(val));
+            resultTable.appendChild(newRow);
+        }
+
+    });
+    return resultTable.outerHTML; // Возвращаем HTML таблицы
+}
+
+export function addEventListenersToDeleteButtons(tableSelector) {
+    const table = document.querySelector(tableSelector);
+    const deleteButtons = table.querySelectorAll(".delete-button");
+
+    deleteButtons.forEach(button => {
+        button.addEventListener("click", (event) => {
+            // Удаляем родительскую строку кнопки при нажатии
+            event.target.closest("tr").remove();
+        });
+    });
+}
+
+export function getReport(bs, rawTableID){
+    let resultTable = document.createElement('table');
+    let rows = document.querySelectorAll(rawTableID);
+
+    rows.forEach((row, rowN) => {
+        let rowValues = [];
+        Array.from(row.cells).forEach((cell) => {
+            let newCell = document.createElement(rowN === 0 ? "th" : "td");
+            newCell.textContent = cell.textContent.trim();
+            rowValues.push(newCell);            
+        });
+
+        if (rowN === 0){
+            let newRow = document.createElement("tr");
+
+            let headers = ["№ пп", "Номер БС", "Название БС", "№ ТЦП", "Наименование работ", "фактическая дата выполнения работ", "Ед. изм.", 
+                "Кол-во", "Цена за ед. (без НДС)", "Стоимость работ, Сум (без НДС)", "Стоимость работ, Сум (с НДС)"]
+            headers.forEach(headerText => {
+                let th = document.createElement('th');
+                th.textContent = headerText;
+                newRow.appendChild(th)
+            });
+
+            resultTable.appendChild(newRow);
+        }
+
+        if (rowN !==0){
+            let newRow = document.createElement("tr");
+
+            let td_N = document.createElement('td');
+            td_N.textContent = 1;
+            newRow.appendChild(td_N)
+
+            let td_bsID = document.createElement('td');
+            td_bsID.textContent = bs['ID'];
+            newRow.appendChild(td_bsID)
+
+            let td_bsNm = document.createElement('td');
+            td_bsNm.textContent = bs['Name'];
+            newRow.appendChild(td_bsNm)
+
+            let td_wID = document.createElement('td');
+            td_wID.textContent = rowValues[1].textContent;
+            newRow.appendChild(td_wID)
+
+            let td_wNm = document.createElement('td');
+            td_wNm.textContent = rowValues[2].textContent;
+            newRow.appendChild(td_wNm)
+
+            let td_date = document.createElement('td');
+            td_date.textContent = '';
+            newRow.appendChild(td_date)
+
+            let td_uom = document.createElement('td');
+            td_uom.textContent = rowValues[3].textContent;
+            newRow.appendChild(td_uom)
+
+            let td_qty= document.createElement('td');
+            td_qty.textContent = rowValues[4].textContent.replace(",", ".");
+            newRow.appendChild(td_qty)
+
+            let td_prc= document.createElement('td');
+            td_prc.textContent = rowValues[10].textContent;
+            newRow.appendChild(td_prc)
+
+            let td_cst= document.createElement('td');
+            td_cst.textContent =Number(rowValues[10].textContent)*Number(rowValues[4].textContent.replace(",", "."));
+            newRow.appendChild(td_cst)
+
+            let td_cstNDS= document.createElement('td');
+            td_cstNDS.textContent = (Number(rowValues[10].textContent)*Number(rowValues[4].textContent.replace(",", "."))*1.12).toFixed(1);
+            newRow.appendChild(td_cstNDS)
+
+
+            resultTable.appendChild(newRow);
+        }
+    });
     return resultTable.outerHTML; // Возвращаем HTML таблицы
 }
