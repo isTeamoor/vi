@@ -1,84 +1,70 @@
 <template>
     <div>
-
-      <div class="input-container">
-        <input type="file" id="docxFileInput" @change="extractInfo" />
+      <div id="inputData">
+        <input type="file" id="insertDocx" @change="input" />
       </div>
 
-      <div id="BS">
+      <div id="bsData">
         <h1 style="text-align: center;">Определение номера и параметров БС:</h1>
-        <div id="BSrow" style="margin-bottom: 5px;font-weight: bold;text-align: center;"></div>
-        <div id="BSnumber" style="margin:20px 600px;"></div>
-        <div>Выбранное значение: {{ bs }}</div>
+        <div id="bsInfo" style="margin-bottom: 5px;font-weight: bold;text-align: center;"></div>
+        <div id="bsForm" style="margin:20px 600px;"></div>
+        <div>Выбранное значение: {{ site }}</div>
       </div>
 
-      <div id="Works">
+      <div id="worksData">
         <h1 style="text-align: center;">Определение номера и параметров Работ:</h1>
         <div id="rawTable"></div>
       </div>
-
-      <div id="Result" style="text-align: center;">
+     
+      <div id="reportData" style="text-align: center;">
         <h1 style="text-align: center;">Сформировать отчёт</h1>
         <button @click="makeReport" >Go</button>
         <div id="report"></div>
       </div>
 
-      <div id="output"></div>
-      
     </div>
 </template>
   
 <script>
-import {openWord} from '../JS/fileReader.js'
-import {getBSnumber} from '../JS/docxData.js'
-import {createBSform } from '../JS/docxData.js';
-import {modTable} from '../JS/docxData.js';
-import {addDeleteButton} from '../JS/docxData.js';
-import {addEventListenersToDeleteButtons} from '../JS/docxData.js';
-import {getReport} from '../JS/docxData.js';
-
+import { readDocx } from '../JS/docx/docxReader.js';
+import { getBStable,getWorksTable } from '@/JS/docx/srcTables.js';
+import { bsDataExplorer } from '@/JS/docx/bsData.js';
+import { worksDataExplorer } from '@/JS/docx/worksData.js';
+import { getReport } from '../JS/docxData.js';
 
 export default {
   data(){
     return{
-      bs:{}
+      rawData:'',
+      bsData:'',
+      worksData:'',
+      site:{},
     }
   },
   methods: {
-    async extractInfo(event){
-
-      // Контейнер для загрузки всей информации из файла
-      let fileData = document.querySelector('#output')
-      fileData.innerHTML = await openWord(event);
-
-
-      //Поиск строки с данными о БС
-      let bsData = getBSnumber(fileData);
-      document.querySelector('#BSrow').textContent = bsData['BSrow'];
-
-
-      //Создание формы с радиокнопками для выбора верного номера БС
-      document.querySelector('#BSnumber').innerHTML = createBSform(bsData);
-
-      let form = document.getElementById('bsForm');
-      form.addEventListener('change', event=> {
-        if (event.target.name === 'bsOptions') {
-          this.bs = {
-            Owner: event.target.getAttribute('owner'),
-            ID: event.target.getAttribute('bsID'),
-            Name: event.target.getAttribute('bsname')
-          };
-        }
-      });
-
-      //Таблица работ
-      rawTable.innerHTML = modTable(fileData)    
+    async input(event){
+      this.rawData = await readDocx(event)
     },
-    //Отчёт
     makeReport(){
-      document.getElementById('report').innerHTML = getReport(this.bs, '#rawTable table tr')
+      document.getElementById('reportData').innerHTML = getReport(this.site, '#worksData tr')
+    },
+    changeSite(val){
+      this.site = val
+    }    
+  },
+  watch:{
+    rawData(newVal){
+      this.bsData = getBStable(newVal);
+      this.worksData = getWorksTable(newVal);
+    },
+    bsData(newVal){
+      let bsCalculations = bsDataExplorer(newVal, this.changeSite)
+      document.querySelector('#bsInfo').textContent = bsCalculations['bsInfo'];
+      document.querySelector('#bsForm').appendChild (bsCalculations['bsForm']);
+    },
+    worksData(newVal){
+      document.querySelector('#worksData').appendChild(worksDataExplorer(newVal))
     }
-
   }
 };
 </script>
@@ -86,7 +72,7 @@ export default {
 
 
 <style >
-  #BS, #Works, #Result {
+  #bsData, #worksData, #reportData {
     border: 2px solid black;
   }
 
