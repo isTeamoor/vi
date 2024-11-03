@@ -1,9 +1,9 @@
 import { siteList } from "./sites";
 import { worksList } from './works';
-const fileData = document.getElementById('output')
 
 
-function getBSrow(){
+
+function getBSrow(fileData){
     let rows = fileData.querySelectorAll('tr')
     let BSrow = null;
     rows.forEach((row) => {
@@ -15,8 +15,8 @@ function getBSrow(){
     });
     return BSrow
 }
-export function getBSnumber(){
-    let BSrow = getBSrow().textContent
+export function getBSnumber(fileData){
+    let BSrow = getBSrow(fileData).textContent
 
     let matches = BSrow.match(/\d{3,}/g);
     let numbers = matches ? matches.map(Number) : [];
@@ -55,7 +55,7 @@ export function createBSform(BSdata){
 
     return formHTML
 }
-function getWorksTable() {
+function getWorksTable(fileData) {
     let tables = fileData.querySelectorAll('table');
     let rawTable = null;
 
@@ -77,8 +77,8 @@ function isTotalRow(row){
     }
     return flag
 }
-export function modTable() {
-    let rawTable = getWorksTable()
+export function modTable(fileData) {
+    let rawTable = getWorksTable(fileData)
     let resultTable = document.createElement('table')
     let rows = rawTable.querySelectorAll('tr')
 
@@ -97,13 +97,19 @@ export function modTable() {
 
         // Добавляем заголовки таблицы только для первой строки
         if (rowN === 0) {
+            let newRow = document.createElement("tr");
+
+            let headerCell = document.createElement("th");
+            headerCell.textContent = "Удалить строку";
+            newRow.appendChild(headerCell);
+
             const headers = ['ID (src)', 'WorkName (src)', 'UOM (src)', 'Price (src)', 'Owner (src)'];
             headers.forEach(headerText => {
                 let th = document.createElement('th');
                 th.textContent = headerText;
                 rowValues.push(th);
             });
-            let newRow = document.createElement("tr");
+            
             rowValues.forEach(val => newRow.appendChild(val));
             resultTable.appendChild(newRow);
         }
@@ -125,6 +131,15 @@ export function modTable() {
 
             matchedWorks.forEach((item) => {
                 let newRow = document.createElement("tr");
+
+                //Добавляем кнопку "удалить строку"
+                let deleteCell = document.createElement("td");
+                let deleteButton = document.createElement("button");
+                deleteButton.textContent = "Удалить";
+                deleteButton.classList.add("delete-button");
+                
+                deleteCell.appendChild(deleteButton);
+                newRow.appendChild(deleteCell);
                 
                 // Клонируем каждую ячейку из rowValues и добавляем в newRow
                 rowValues.forEach(val => {
@@ -156,63 +171,17 @@ export function modTable() {
         }
     });
 
-    return resultTable.outerHTML; // Возвращаем HTML таблицы
-}
-
-export function addDeleteButton(htmlID) {
-    let resultTable = document.createElement("table");
-    let rows = document.querySelectorAll(htmlID);
-
-    rows.forEach((row, rowN) => {
-        let rowValues = [];
-        Array.from(row.cells).forEach((cell) => {
-            let newCell = document.createElement(rowN === 0 ? "th" : "td");
-            newCell.textContent = cell.textContent.trim();
-            rowValues.push(newCell);            
-        });
-
-        if (rowN === 0){
-            let newRow = document.createElement("tr");
-
-            let headerCell = document.createElement("th");
-            headerCell.textContent = "Удалить строку";
-            newRow.appendChild(headerCell);
-            
-            rowValues.forEach(val => newRow.appendChild(val));
-            resultTable.appendChild(newRow);
-        }
-
-        if (rowN !== 0){
-            let newRow = document.createElement("tr");
-
-            let deleteCell = document.createElement("td");
-            let deleteButton = document.createElement("button");
-            deleteButton.textContent = "Удалить";
-            deleteButton.classList.add("delete-button");
-            
-            deleteCell.appendChild(deleteButton);
-            newRow.appendChild(deleteCell);
-
-            rowValues.forEach(val => newRow.appendChild(val));
-            resultTable.appendChild(newRow);
-        }
-
-    });
-    return resultTable.outerHTML; // Возвращаем HTML таблицы
-}
-
-export function addEventListenersToDeleteButtons(tableSelector) {
-    const table = document.querySelector(tableSelector);
-    const deleteButtons = table.querySelectorAll(".delete-button");
-
+    //Добавляем event Listener на кнопки "удалить строку"
+    const deleteButtons = resultTable.querySelectorAll(".delete-button");
     deleteButtons.forEach(button => {
         button.addEventListener("click", (event) => {
             // Удаляем родительскую строку кнопки при нажатии
             event.target.closest("tr").remove();
         });
     });
-}
 
+    return resultTable.outerHTML; // Возвращаем HTML таблицы
+}
 export function getReport(bs, rawTableID){
     let resultTable = document.createElement('table');
     let rows = document.querySelectorAll(rawTableID);

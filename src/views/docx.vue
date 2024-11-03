@@ -53,7 +53,7 @@ export default {
 
 
       //Поиск строки с данными о БС
-      let bsData = getBSnumber();
+      let bsData = getBSnumber(fileData);
       document.querySelector('#BSrow').textContent = bsData['BSrow'];
 
 
@@ -71,16 +71,10 @@ export default {
         }
       });
 
-
-
-
-
-      ///////////////Таблица работ//////////////
-      rawTable.innerHTML = modTable()
-      document.getElementById('rawTable').innerHTML = addDeleteButton('#rawTable table tr')
-      addEventListenersToDeleteButtons('#rawTable');     
+      //Таблица работ
+      rawTable.innerHTML = modTable(fileData)    
     },
-    /////////////////Отчёт///////////////////////
+    //Отчёт
     makeReport(){
       document.getElementById('report').innerHTML = getReport(this.bs, '#rawTable table tr')
     }
