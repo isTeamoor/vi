@@ -4,20 +4,14 @@ export function worksDataExplorer(worksDataHTML){
     let tempDiv = document.createElement('div');
     tempDiv.innerHTML = worksDataHTML;
 
-    let resultTable = document.createElement('table')
+    let rows = Array.from(tempDiv.querySelectorAll('tr'))
+    rows = rows.filter(row => !isEmpty(row))   //Удалить все полностью пустые ячейки
+    rows = rows.filter(row => !isTotalRow(row))//Удалить итоговые строки
 
-    Array.from(tempDiv.querySelectorAll('tr')).forEach((row, rowN)=>{
-        
-        //Проверка является ли строка итоговой, если да, то пропускаем ее
-        if (isTotalRow(row)){return}
 
-        // Копируем исходные значения ячеек каждой строки в массив
-        let rowValues = [];
-        Array.from(row.cells).forEach((cell) => {
-            let newCell = document.createElement(rowN === 0 ? "th" : "td");
-            newCell.textContent = cell.textContent.trim();
-            rowValues.push(newCell);            
-        });
+    let resultTable = document.createElement('table') 
+    
+    rows.forEach((row, rowN)=>{
 
         // Добавляем заголовки таблицы
         if (rowN === 0) {
@@ -27,20 +21,33 @@ export function worksDataExplorer(worksDataHTML){
             deleteHeader.textContent = "Удалить строку";
             newRow.appendChild(deleteHeader);
 
-            const headers = ['ID (src)', 'WorkName (src)', 'UOM (src)', 'Price (src)', 'Owner (src)'];
+            const headers = ['№ пункта по ТЦП','ID (src)', 'Наименование работ','Ед.изм','Кол-во','Цена за ед.',
+                'Общая стоимость','WorkName (src)', 'UOM (src)', 'Price (src)', 'Owner (src)'];
             headers.forEach(headerText => {
                 let th = document.createElement('th');
                 th.textContent = headerText;
-                rowValues.push(th);
+                newRow.appendChild(th)
             });
-            
-            rowValues.forEach(val => newRow.appendChild(val));
+
             resultTable.appendChild(newRow);
         }
 
         // Добавляем строки новой таблицы со значениями из старой
         if (rowN !== 0) {
-            let matchedWorks = searchWorks(row);
+
+            //Проверки и корректировки строк
+            let checkedRow = hasWrongID(row);
+
+            // Копируем исходные значения ячеек каждой строки в массив
+            let rowValues = [];
+            Array.from(checkedRow.cells).forEach((cell) => {
+                let newCell = document.createElement("td");
+                newCell.textContent = cell.textContent.trim();
+                rowValues.push(newCell);            
+            });
+
+            //Поиск в справочнике работ с аналогичным номером
+            let matchedWorks = searchWorks(checkedRow);
             
             matchedWorks.forEach((item) => {
                 let newRow = document.createElement("tr");
@@ -134,3 +141,52 @@ function deleteEventlistener(table){
         }
     });
 }
+function isEmpty(row){
+    let flag = true;
+    Array.from(row.cells).forEach(cell=>{
+        if (/[^\s]/.test(cell.textContent.trim())){
+            flag = false
+        }
+    })
+    return flag
+}
+function hasWrongID(row) {
+    let modRow = document.createElement('tr');
+
+
+    if (/[^\s]/.test(row.cells[0].textContent.trim())) {
+        return row; // Если в первой ячейке есть какой то текст, то возвращаем оригинальную строку
+    }
+
+
+    // Используем регулярное выражение для извлечения ID и оставшегося текста
+    let insideWorkIDMatch = row.cells[1].textContent.match(/^(\d+(\.\d+)?)(?=\D{1,3})/);
+
+    
+    // Проверяем, нашли ли мы совпадение
+    if (insideWorkIDMatch) {
+        let insideWorkID = insideWorkIDMatch[0];
+        let remainingText = row.cells[1].textContent.replace(insideWorkID, '').trim(); // Удаляем ID из текста
+
+
+        let ID = document.createElement('td');
+        ID.textContent = insideWorkID;
+        modRow.appendChild(ID);
+
+
+        let WorkName = document.createElement('td');
+        WorkName.textContent = remainingText;
+        modRow.appendChild(WorkName);
+
+        // Копируем остальные ячейки из оригинального ряда
+        for (let i = 2; i < row.cells.length; i++) {
+            let td = document.createElement('td');
+            td.textContent = row.cells[i].textContent;
+            modRow.appendChild(td);
+        }
+        return modRow; // Возвращаем модифицированную строку
+    }
+    return row; // Возвращаем оригинальный ряд, если ID не найден
+}
+
+
