@@ -1,4 +1,4 @@
-import { worksList } from '../works';
+import { worksList } from './works';
 
 export function worksDataExplorer(worksDataHTML){
     let tempDiv = document.createElement('div');
@@ -21,8 +21,8 @@ export function worksDataExplorer(worksDataHTML){
             deleteHeader.textContent = "Удалить строку";
             newRow.appendChild(deleteHeader);
 
-            const headers = ['№ пункта по ТЦП','ID (src)', 'Наименование работ','Ед.изм','Кол-во','Цена за ед.',
-                'Общая стоимость','WorkName (src)', 'UOM (src)', 'Price (src)', 'Owner (src)'];
+            const headers = ['№ пункта по ТЦП', 'Наименование работ','Ед.изм','Кол-во','Цена за ед.',
+                'Общая стоимость','ID (src)','WorkName (src)', 'UOM (src)', 'Price (src)', 'Owner (src)'];
             headers.forEach(headerText => {
                 let th = document.createElement('th');
                 th.textContent = headerText;

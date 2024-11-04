@@ -1,11 +1,6 @@
-import { bsRowCriteria } from "./srcTables";
 import { siteList } from "../sites";
 
-export function bsDataExplorer(bsDataHTML, callback){
-    let tempDiv = document.createElement('div');
-    tempDiv.innerHTML = bsDataHTML;
-
-    let bsRow = searchBSrow(tempDiv.querySelectorAll('tr'));
+export function bsDataExplorer(bsRow, callback){ 
     let bsInfo = bsRow.cells[2].textContent;
 
     let probableSitesList = extractBSnumbers(bsInfo);
@@ -17,19 +12,6 @@ export function bsDataExplorer(bsDataHTML, callback){
         'bsForm':bsForm
     };
     return output
-}
-function searchBSrow(rows) {
-    let targetRow = null;
-
-    rows.forEach(row => {
-        Array.from(row.cells).forEach(cell => {
-            if (bsRowCriteria.some(criteria => cell.textContent.toLowerCase().includes(criteria))) {
-                targetRow = row;
-            }
-        });
-    });
-
-    return targetRow;
 }
 function extractBSnumbers(bsInfo){
     let matches = bsInfo.match(/\d{3,}/g);

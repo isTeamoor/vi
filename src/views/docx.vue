@@ -5,19 +5,19 @@
       </div>
 
       <div id="bsData">
-        <h1 style="text-align: center;">Определение номера и параметров БС:</h1>
-        <div id="bsInfo" style="margin-bottom: 5px;font-weight: bold;text-align: center;"></div>
-        <div id="bsForm" style="margin:20px 600px;"></div>
+        <h1>Определение номера и параметров БС:</h1>
+        <div id="bsInfo"></div>
+        <div id="bsForm"></div>
         <div>Выбранное значение: {{ site }}</div>
       </div>
 
       <div id="worksData">
-        <h1 style="text-align: center;">Определение номера и параметров Работ:</h1>
+        <h1>Определение номера и параметров Работ:</h1>
         <div id="rawTable"></div>
       </div>
      
-      <div id="reportData" style="text-align: center;">
-        <h1 style="text-align: center;">Сформировать отчёт</h1>
+      <div id="reportData">
+        <h1>Сформировать отчёт</h1>
         <button @click="makeReport" >Go</button>
         <div id="report"></div>
       </div>
@@ -26,11 +26,11 @@
 </template>
   
 <script>
-import { readDocx } from '../JS/docx/docxReader.js';
+import { readDocx } from '../JS/fileReader.js';
 import { getBStable,getWorksTable } from '@/JS/docx/srcTables.js';
 import { bsDataExplorer } from '@/JS/docx/bsData.js';
-import { worksDataExplorer } from '@/JS/docx/worksData.js';
-import { getReport } from '../JS/docxData.js';
+import { worksDataExplorer } from '@/JS/worksData.js';
+import { getReport } from '../JS/report.js';
 
 export default {
   data(){
@@ -76,15 +76,30 @@ export default {
     border: 2px solid black;
   }
 
-  table td {
+  td, th {
     border: 2px solid black
   }
 
-  .input-container{
+  .inputData{
     display: flex;
     justify-content: center;
     align-items: center;
     height: 50px;
+  }
+
+  h1 {
+    text-align: center;
+  }
+  #bsInfo{
+    margin-bottom: 5px;
+    font-weight: bold;
+    text-align: center;
+  }
+  #bsForm {
+    margin:20px 600px;
+  }
+  #reportData{
+    text-align: center;
   }
 </style>
   
