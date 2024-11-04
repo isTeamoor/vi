@@ -18,7 +18,8 @@
      
       <div id="reportData">
         <h1>Сформировать отчёт</h1>
-        <button @click="makeReport" >Go</button>
+        <button @click="makeReport">Давай</button>
+        <button @click="toExcel">Скачать таблицу</button>
         <div id="report"></div>
       </div>
 
@@ -31,6 +32,7 @@ import { getBStable,getWorksTable } from '@/JS/docx/srcTables.js';
 import { bsDataExplorer } from '@/JS/docx/bsData.js';
 import { worksDataExplorer } from '@/JS/worksData.js';
 import { getReport } from '../JS/report.js';
+import { printReports } from '@/JS/reportWriter.js';
 
 export default {
   data(){
@@ -46,11 +48,14 @@ export default {
       this.rawData = await readDocx(event)
     },
     makeReport(){
-      document.getElementById('reportData').innerHTML = getReport(this.site, '#worksData tr')
+      document.getElementById('report').innerHTML = getReport(this.site, '#worksData tr')
     },
     changeSite(val){
       this.site = val
-    }    
+    },
+    toExcel(){
+      printReports('#report');
+    }
   },
   watch:{
     rawData(newVal){
