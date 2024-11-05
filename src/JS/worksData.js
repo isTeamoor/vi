@@ -81,7 +81,7 @@ function isTotalRow(row){
     let flag = false
 
     Array.from(row.cells).forEach(cell=>{
-        if (cell.colSpan > 1 || cell.textContent.toLowerCase().includes('итого')) {
+        if (cell.textContent.toLowerCase().includes('итого')) {
             flag = true;
         }
     })

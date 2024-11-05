@@ -1,4 +1,5 @@
 export const bsRowCriteria = ['название бс', 'регион и адрес']
+
 export const worksTableCriteria = [
     'общая стоимость','общая сумма',
     'цена за единицу','цена за ед',
@@ -11,10 +12,10 @@ export function getBStable(rawData){
     tempDiv.innerHTML = rawData;
     let rows = tempDiv.querySelectorAll('tr');
 
-    rows.forEach(row => {
+    rows.forEach( row => {
         let cells = row.querySelectorAll('td');
         
-        cells.forEach(cell=>{
+        cells.forEach( cell => {
             cell.textContent = cell.textContent.replace(/['"«»]/g, '')
             if (bsRowCriteria.some(criteria => cell.textContent.toLowerCase().includes(criteria))) {
                 targetRow = row;
@@ -30,30 +31,33 @@ export function getWorksTable(rawData){
     let tempDiv = document.createElement('div');
     tempDiv.innerHTML = rawData;
 
-    let rows = tempDiv.querySelectorAll('tr');
+    let isTargetTable = false;
 
-    let flagWorksTable = false;
+    tempDiv.querySelectorAll('tr').forEach( row => {
 
-    rows.forEach(row=>{
-        let targetValues = []
+        let rowValues =[];
 
         Array.from(row.cells).forEach((cell,i)=>{
+
             if (worksTableCriteria.some(criteria => cell.textContent.toLowerCase().includes(criteria))) {
-                flagWorksTable = true;
+                isTargetTable = true;
             }
-            if (cell.textContent.toLocaleLowerCase().includes('итого')){
-                flagWorksTable = false;
+
+            if (cell.textContent.toLocaleLowerCase().includes('итого')
+             || cell.textContent.toLocaleLowerCase().includes('всего')){
+                isTargetTable = false;
             }
+
             if (i<=5){
                 let val = document.createElement('td');
                 val.textContent = cell.textContent;
-                targetValues.push(val)
+                rowValues.push(val)
             }
+        });
 
-        })
-        if (flagWorksTable){
+        if (isTargetTable){
             let newRow = document.createElement('tr');
-            targetValues.forEach(val=>{
+            rowValues.forEach( val => {
                 newRow.appendChild(val)
             })
             targetTable.appendChild(newRow)

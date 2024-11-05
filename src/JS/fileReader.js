@@ -23,19 +23,18 @@ export async function readXlsx(event) {
         reader.onload = (e) => {
             const arrayBuffer = e.target.result;
             const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
-            // Получаем первый лист
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
-
-            // Конвертируем первый лист в HTML
             let html = XLSX.utils.sheet_to_html(worksheet);
 
-            // Парсим HTML и убираем все атрибуты у тегов
+
+            // Парсим HTML и 
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            doc.querySelectorAll('*').forEach(element => {
-                Array.from(element.attributes).forEach(attr => element.removeAttribute(attr.name));
+
+            //Убираем все атрибуты у тегов
+            doc.querySelectorAll('*').forEach( element => {
+                Array.from(element.attributes).forEach( attr => element.removeAttribute(attr.name));
             });
 
             // Возвращаем HTML как строку без атрибутов
