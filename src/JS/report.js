@@ -30,7 +30,9 @@ function reportTable(bs, rows){
 
     resultTable.appendChild(headerRow);
 
-
+    //Переменные для итоговой строки
+    let sum1 = 0;
+    let sum2 = 0;
 
     rows.forEach(row => {
         
@@ -84,17 +86,38 @@ function reportTable(bs, rows){
         // Столбец-9. Стоимость без НДС
         let td_cst= document.createElement('td');
         td_cst.textContent =Number(rowValues[10].textContent)*Number(rowValues[4].textContent.replace(",", "."));
+        sum1 += Number(td_cst.textContent)
         
         // Столбец-10. Стоимость с НДС
         let td_cstNDS= document.createElement('td');
         td_cstNDS.textContent = (Number(rowValues[10].textContent)*Number(rowValues[4].textContent.replace(",", "."))*1.12).toFixed(1);
-        
+        sum2 += Number(td_cstNDS.textContent)
 
-        [td_N,td_bsID,td_bsNm,td_wID,td_wNm,td_date,td_uom,td_qty,td_prc,td_cst,td_cstNDS].forEach(x=>{
+        let tds = [td_N,td_bsID,td_bsNm,td_wID,td_wNm,td_date,td_uom,td_qty,td_prc,td_cst,td_cstNDS]
+        tds.forEach(x=>{
             newRow.appendChild(x)
         })
         resultTable.appendChild(newRow);
     });
+
+    //Добавление итоговой строки
+    let totalRow = document.createElement('tr');
+
+    let spanedTD = document.createElement('td')
+    spanedTD.textContent = 'Итого по БС';
+    spanedTD.colSpan = 9;
+    totalRow.appendChild(spanedTD);
+
+    let sumCost = document.createElement('td');
+    sumCost.textContent = sum1;
+    totalRow.appendChild(sumCost);
+
+    let sumCostNDS = document.createElement('td');
+    sumCostNDS.textContent = sum2;
+    totalRow.appendChild(sumCostNDS);
+
+
+    resultTable.appendChild(totalRow)
 
     return resultTable
 }
