@@ -28,7 +28,7 @@ export async function readXlsx(event) {
             let html = XLSX.utils.sheet_to_html(worksheet);
 
 
-            // Парсим HTML и 
+            // Парсим HTML
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
 

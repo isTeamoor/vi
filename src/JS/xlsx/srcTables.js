@@ -5,17 +5,19 @@ export const worksTableCriteria = [
     'цена за единицу','цена за ед',
     '№ пункта по тцп','пункт в тцп',]
 
-export function getBStable(rawData){
-    let targetRow = null;
 
+
+
+
+export function getBSrow(rawData){
     let tempDiv = document.createElement('div');
     tempDiv.innerHTML = rawData;
-    let rows = tempDiv.querySelectorAll('tr');
 
-    rows.forEach( row => {
-        let cells = row.querySelectorAll('td');
+    let targetRow = null;
+
+    tempDiv.querySelectorAll('tr').forEach( row => {
         
-        cells.forEach( cell => {
+        row.querySelectorAll('td').forEach( cell => {
             cell.textContent = cell.textContent.replace(/['"«»]/g, '')
             if (bsRowCriteria.some(criteria => cell.textContent.toLowerCase().includes(criteria))) {
                 targetRow = row;
@@ -26,24 +28,26 @@ export function getBStable(rawData){
     return targetRow
 }
 export function getWorksTable(rawData){
-    let targetTable = document.createElement('table')
-
     let tempDiv = document.createElement('div');
     tempDiv.innerHTML = rawData;
 
+    let targetTable = document.createElement('table')
+
+    
     let isTargetTable = false;
 
     tempDiv.querySelectorAll('tr').forEach( row => {
 
-        let rowValues =[];
+        let rowValues = [];
 
-        Array.from(row.cells).forEach((cell,i)=>{
 
-            if (worksTableCriteria.some(criteria => cell.textContent.toLowerCase().includes(criteria))) {
-                isTargetTable = true;
+        Array.from(row.cells).forEach( (cell,i) => {
+
+            if (worksTableCriteria.some(criteria => cell.textContent.toLowerCase().includes(criteria))) {  //условие для начала таблицы
+                isTargetTable = true;                                        
             }
 
-            if (cell.textContent.toLocaleLowerCase().includes('итого')
+            if (cell.textContent.toLocaleLowerCase().includes('итого')                                     //условие для завершения таблицы
              || cell.textContent.toLocaleLowerCase().includes('всего')){
                 isTargetTable = false;
             }
@@ -64,5 +68,5 @@ export function getWorksTable(rawData){
         }
     })
 
-    return targetTable.outerHTML
+    return targetTable
 }

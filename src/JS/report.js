@@ -1,7 +1,7 @@
-export function getReport(bs, rawTableID){
+export function getReport(bs, rowsSelector){
     let report = document.createElement('div');
 
-    let allRawRows = document.querySelectorAll(rawTableID);
+    let allRawRows = document.querySelectorAll(rowsSelector);
 
     let rowsNTI = Array.from(allRawRows).filter(row => row.cells[11].textContent.toLowerCase() === 'nti');
     let rowsUNT = Array.from(allRawRows).filter(row => row.cells[11].textContent.toLowerCase() === 'unitel');
@@ -15,6 +15,8 @@ export function getReport(bs, rawTableID){
 
 function reportTable(bs, rows){
     let resultTable = document.createElement('table');
+
+
 
     // Добавляем заголовки таблицы
     let headerRow = document.createElement("tr");
@@ -30,6 +32,9 @@ function reportTable(bs, rows){
 
     resultTable.appendChild(headerRow);
 
+
+
+
     //Переменные для итоговой строки
     let sum1 = 0;
     let sum2 = 0;
@@ -38,15 +43,17 @@ function reportTable(bs, rows){
         
         // Копируем исходные значения ячеек каждой строки в массив
         let rowValues = [];
-        Array.from(row.cells).forEach((cell) => {
+        Array.from(row.cells).forEach( cell => {
             let newCell = document.createElement("td");
             newCell.textContent = cell.textContent.trim();
             rowValues.push(newCell);            
         });
 
+    
         // Добавляем строки новой таблицы со значениями из старой
         let newRow = document.createElement("tr");
 
+        
         // Столбец-1. № пп
         let td_N = document.createElement('td');
         td_N.textContent = 1;

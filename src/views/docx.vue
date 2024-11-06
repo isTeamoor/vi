@@ -1,35 +1,35 @@
 <template>
-    <div>
-      <div id="inputData">
-        <input type="file" id="insertDocx" @change="input" />
-      </div>
-
-      <div id="bsData">
-        <h1>Определение номера и параметров БС:</h1>
-        <div id="bsInfo"></div>
-        <div id="bsForm"></div>
-        <div>Выбранное значение: {{ site }}</div>
-      </div>
-
-      <div id="worksData">
-        <h1>Определение номера и параметров Работ:</h1>
-        <div id="rawTable"></div>
-      </div>
-     
-      <div id="reportData">
-        <h1>Сформировать отчёт</h1>
-        <button @click="makeReport">Давай</button>
-        <button @click="toExcel">Скачать таблицу</button>
-        <div id="report"></div>
-      </div>
-
+  <div>
+    <div id="inputData">
+      <input type="file" id="insertDocx" @change="input" />
     </div>
+
+    <div id="bsData">
+      <h1>Определение номера и параметров БС:</h1>
+      <div id="bsInfo"></div>
+      <div id="bsForm"></div>
+      <div>Выбранное значение: {{ site }}</div>
+    </div>
+
+    <div id="worksData">
+      <h1>Определение номера и параметров Работ:</h1>
+      <div id="rawTable"></div>
+    </div>
+    
+    <div id="reportData">
+      <h1>Сформировать отчёт</h1>
+      <button @click="makeReport">Давай</button>
+      <button @click="toExcel">Скачать таблицу</button>
+      <div id="report"></div>
+    </div>
+
+  </div>
 </template>
   
 <script>
 import { readDocx } from '../JS/fileReader.js';
-import { getBStable,getWorksTable } from '@/JS/docx/srcTables.js';
-import { bsDataExplorer } from '@/JS/docx/bsData.js';
+import { getBSrow,getWorksTable } from '@/JS/docx/srcTables.js';
+import { bsDataExplorer } from '@/JS/bsData.js';
 import { worksDataExplorer } from '@/JS/worksData.js';
 import { getReport } from '../JS/report.js';
 import { printReports } from '@/JS/reportWriter.js';
@@ -45,10 +45,10 @@ export default {
   },
   methods: {
     async input(event){
-      this.rawData = await readDocx(event)
+      this.rawData = await readDocx(event) //возвращает HTML загруженного документа
     },
     makeReport(){
-      document.getElementById('report').innerHTML = getReport(this.site, '#worksData tr')
+      document.getElementById('report').innerHTML = getReport(this.site, '#worksData tr') //возвращает 2 tables
     },
     changeSite(val){
       this.site = val
@@ -59,16 +59,16 @@ export default {
   },
   watch:{
     rawData(newVal){
-      this.bsData = getBStable(newVal);
-      this.worksData = getWorksTable(newVal);
+      this.bsData = getBSrow(newVal);         //возвращает tr
+      this.worksData = getWorksTable(newVal); //возвращает table
     },
     bsData(newVal){
       let bsCalculations = bsDataExplorer(newVal, this.changeSite)
-      document.querySelector('#bsInfo').textContent = bsCalculations['bsInfo'];
-      document.querySelector('#bsForm').appendChild (bsCalculations['bsForm']);
+      document.querySelector('#bsInfo').textContent = bsCalculations['bsInfo']; 
+      document.querySelector('#bsForm').appendChild (bsCalculations['bsForm']); //div c формой
     },
     worksData(newVal){
-      document.querySelector('#worksData').appendChild(worksDataExplorer(newVal))
+      document.querySelector('#worksData').appendChild(worksDataExplorer(newVal)) //возвращает table
     }
   }
 };

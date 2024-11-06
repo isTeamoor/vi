@@ -1,6 +1,6 @@
-import { siteList } from "../sites";
+import { siteList } from "./sites";
 
-export function bsDataExplorer(bsRow, callback){ 
+export function bsDataExplorer(bsRow, callback){
     let bsInfo = bsRow.cells[2].textContent;
 
     let probableSitesList = extractBSnumbers(bsInfo);
@@ -33,7 +33,7 @@ function extractBSnumbers(bsInfo){
 }
 function createBSform(probableSitesList, callback) {
     let form = document.createElement('div');
-    form.innerHTML = '<form id="bsForm">';
+    form.innerHTML = '<form>';
 
     for (let site of probableSitesList) {
         const owner = site['Owner'];

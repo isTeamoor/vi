@@ -4,8 +4,6 @@
       <input type="file" id="insertXlsx" @change="input" />
     </div>
 
-    <div id="showHTML"></div>
-
     <div id="bsData">
       <h1>Определение номера и параметров БС:</h1>
       <div id="bsInfo"></div>
@@ -30,8 +28,8 @@
 
 <script>
 import { readXlsx } from '../JS/fileReader.js';
-import { getBStable,getWorksTable } from '@/JS/xlsx/srcTables.js';
-import { bsDataExplorer } from '@/JS/xlsx/bsData.js';
+import { getBSrow,getWorksTable } from '@/JS/xlsx/srcTables.js';
+import { bsDataExplorer } from '@/JS/bsData.js';
 import { worksDataExplorer } from '@/JS/worksData.js';
 import { getReport } from '../JS/report.js';
 import { printReports } from '@/JS/reportWriter.js';
@@ -47,10 +45,10 @@ data(){
 },
 methods: {
   async input(event){
-    this.rawData = await readXlsx(event)
+    this.rawData = await readXlsx(event) //возвращает HTML загруженного документа
   },
   makeReport(){
-    document.getElementById('report').innerHTML = getReport(this.site, '#worksData tr')
+    document.getElementById('report').innerHTML = getReport(this.site, '#worksData tr') //возвращает 2 tables
   },
   changeSite(val){
     this.site = val
@@ -61,16 +59,16 @@ methods: {
 },
 watch:{
   rawData(newVal){
-    this.bsData = getBStable(newVal);//Возвращает tr
-    this.worksData = getWorksTable(newVal);
+    this.bsData = getBSrow(newVal);         //Возвращает tr
+    this.worksData = getWorksTable(newVal); //возвращает table
   },
   bsData(newVal){
     let bsCalculations = bsDataExplorer(newVal, this.changeSite)
     document.querySelector('#bsInfo').textContent = bsCalculations['bsInfo'];
-    document.querySelector('#bsForm').appendChild (bsCalculations['bsForm']);
+    document.querySelector('#bsForm').appendChild (bsCalculations['bsForm']); //div c формой
   },
   worksData(newVal){
-    document.querySelector('#worksData').appendChild(worksDataExplorer(newVal))
+    document.querySelector('#worksData').appendChild(worksDataExplorer(newVal)) //возвращает table
   }
 }
 };
