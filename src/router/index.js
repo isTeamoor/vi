@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import xlsx from '../views/xlsx.vue';
 import docx from '../views/docx.vue';
+import msgx from '../views/msgx.vue';
 
 const routes = [
   {
@@ -12,6 +13,11 @@ const routes = [
     path: '/xlsx',
     name: 'xlsx',
     component: xlsx,
+  },
+  {
+    path: '/msgx',
+    name: 'msgx',
+    component: msgx,
   },
 ]
 

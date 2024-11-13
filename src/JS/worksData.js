@@ -3,7 +3,7 @@ import { worksList } from './works';
 export function worksDataExplorer(rawTable){
     let resultTable = document.createElement('table') 
 
-
+    
     let rows = Array.from(rawTable.querySelectorAll('tr'))
 
     rows = rows.filter(row => !isEmpty(row))   //Удалить все полностью пустые ячейки

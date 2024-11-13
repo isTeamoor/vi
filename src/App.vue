@@ -3,6 +3,7 @@
     <h1>Выберите тип источника данных</h1>
     <router-link to="/docx" class="nav-button">Docx</router-link>
     <router-link to="/xlsx" class="nav-button">Xlsx</router-link>
+    <router-link to="/msgx" class="nav-button">Msgx</router-link>
   </div>
   <router-view class="display"/>
 </template>

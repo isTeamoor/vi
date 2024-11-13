@@ -72,7 +72,7 @@ function reportTable(bs, rows){
         
         // Столбец-5. Work Name
         let td_wNm = document.createElement('td');
-        td_wNm.textContent = rowValues[2].textContent;
+        td_wNm.textContent = rowValues[8].textContent;
         
         // Столбец-6. Дата (оставить пустой)
         let td_date = document.createElement('td');
@@ -80,7 +80,7 @@ function reportTable(bs, rows){
         
         // Столбец-7. Единица измерения
         let td_uom = document.createElement('td');
-        td_uom.textContent = rowValues[3].textContent;
+        td_uom.textContent = rowValues[9].textContent;
         
         // Столбец-8. Количество
         let td_qty= document.createElement('td');
