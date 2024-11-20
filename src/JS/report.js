@@ -68,7 +68,7 @@ function reportTable(bs, rows){
         
         // Столбец-4. Work ID
         let td_wID = document.createElement('td');
-        td_wID.textContent = rowValues[1].textContent;
+        td_wID.textContent = `\u200B${rowValues[1].textContent}\u200B`
         
         // Столбец-5. Work Name
         let td_wNm = document.createElement('td');
