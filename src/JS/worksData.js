@@ -105,7 +105,7 @@ function hasWrongID(row) {
 
 
     // Используем регулярное выражение для извлечения ID и оставшегося текста
-    let insideWorkIDMatch = row.cells[1].textContent.match(/^(\d+(\.\d+)?)(?=\D{1,3})/);
+    let insideWorkIDMatch = row.cells[1].textContent.match(/^(\d+(\.\d+)*)(?=\D|$)/);
 
     
     // Проверяем, нашли ли мы совпадение
