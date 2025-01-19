@@ -101,7 +101,7 @@ function reportTable(bs, rows){
         // Столбец-10. Стоимость с НДС
         let td_cstNDS= document.createElement('td');
         //td_cstNDS.textContent = (Number(rowValues[10].textContent)*Number(rowValues[4].textContent.replace(",", "."))*1.12).toFixed(1);
-        td_cstNDS.textContent = `=J${i+2}*12`
+        td_cstNDS.textContent = `=J${i+2}*1,12`
         sum2 += Number(td_cstNDS.textContent)
 
         let tds = [td_N,td_bsID,td_bsNm,td_wID,td_wNm,td_date,td_uom,td_qty,td_prc,td_cst,td_cstNDS]
