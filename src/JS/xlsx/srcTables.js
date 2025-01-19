@@ -1,9 +1,10 @@
 export const bsRowCriteria = ['название бс', 'регион и адрес']
 
 export const worksTableCriteria = [
-    'пункта по тцп', 'наименование работ',
-    'общая стоимость','общая сумма',
-    'цена за единицу','цена за ед',
+    'пункта по тцп', '# пункта по тцп ',
+    'наименование работ','наименование работ',
+    'общая стоимость','общая сумма','общая стоимость',
+    'цена за единицу','цена за ед','цена за ед',
     '№ пункта по тцп','пункт в тцп',]
 
 
@@ -45,7 +46,7 @@ export function getWorksTable(rawData){
         Array.from(row.cells).forEach( (cell,i) => {
 
             if (worksTableCriteria.some(criteria => cell.textContent.toLowerCase().includes(criteria))) {  //условие для начала таблицы
-                isTargetTable = true;                                        
+                isTargetTable = true;                                     
             }
 
             if (cell.textContent.toLocaleLowerCase().includes('итого')                                     //условие для завершения таблицы
@@ -69,5 +70,6 @@ export function getWorksTable(rawData){
         }
     })
 
+    console.log(targetTable)
     return targetTable
 }

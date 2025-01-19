@@ -38,8 +38,10 @@ function reportTable(bs, rows){
     //Переменные для итоговой строки
     let sum1 = 0;
     let sum2 = 0;
+    let lastindex = 1;
 
-    rows.forEach(row => {
+    rows.forEach((row,i) => {
+        lastindex +=1;
         
         // Копируем исходные значения ячеек каждой строки в массив
         let rowValues = [];
@@ -92,12 +94,14 @@ function reportTable(bs, rows){
         
         // Столбец-9. Стоимость без НДС
         let td_cst= document.createElement('td');
-        td_cst.textContent =Number(rowValues[10].textContent)*Number(rowValues[4].textContent.replace(",", "."));
+        //td_cst.textContent =Number(rowValues[10].textContent)*Number(rowValues[4].textContent.replace(",", "."));
+        td_cst.textContent =`=H${i+2}*I${i+2}`;
         sum1 += Number(td_cst.textContent)
         
         // Столбец-10. Стоимость с НДС
         let td_cstNDS= document.createElement('td');
-        td_cstNDS.textContent = (Number(rowValues[10].textContent)*Number(rowValues[4].textContent.replace(",", "."))*1.12).toFixed(1);
+        //td_cstNDS.textContent = (Number(rowValues[10].textContent)*Number(rowValues[4].textContent.replace(",", "."))*1.12).toFixed(1);
+        td_cstNDS.textContent = `=J${i+2}*12`
         sum2 += Number(td_cstNDS.textContent)
 
         let tds = [td_N,td_bsID,td_bsNm,td_wID,td_wNm,td_date,td_uom,td_qty,td_prc,td_cst,td_cstNDS]
@@ -116,15 +120,16 @@ function reportTable(bs, rows){
     totalRow.appendChild(spanedTD);
 
     let sumCost = document.createElement('td');
-    sumCost.textContent = sum1;
+    //sumCost.textContent = sum1;
+    sumCost.textContent = `=СУММ(J${2}:J${lastindex})`
     totalRow.appendChild(sumCost);
 
     let sumCostNDS = document.createElement('td');
-    sumCostNDS.textContent = sum2;
+    //sumCostNDS.textContent = sum2;
+    sumCostNDS.textContent = `=СУММ(K${2}:K${lastindex})`
     totalRow.appendChild(sumCostNDS);
 
 
     resultTable.appendChild(totalRow)
-
     return resultTable
 }
